@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}About{% endblock title %}
+
+{% block body %}
+
+
+<form action="/play-game/" method="post">{% csrf_token %}
+    <div class="container">
+        <br>
+        {% if user_action is none %}
+        <div style="text-align: center;">
+            <h1>Let's Play !</h1>
+        </div>
+        {% endif %}
+        
+        <div style="text-align: center;">{% if user_action %}<h1>Round:{{round_count}}</h1>{% endif %}</div>
+        
+        <br>
+        <div  style="text-align: center;" class="row">
+            {% if user_action %}
+            
+            {% if user_action == computer_action %}
+                <h2>Both players selected {{user_action}}. It's a tie!</h2>
+                {% elif user_action == "rock" %}    
+                {% if computer_action == "scissor" %}
+                <h2>Rock smashes scissors! You win!</h2>
+                {% else %}
+                <h2>Paper covers rock! You lose.</h2>
+                {% endif %}
+            {% elif user_action == "paper" %}
+                {% if computer_action == "rock" %}
+                <h2>Paper covers rock! You win!</h2>
+                {% else %}
+                <h2>Scissors cuts paper! You lose.</h2>
+                {% endif %}
+            {% elif user_action == "scissor" %}   
+                {% if computer_action == "paper" %}
+                <h2>Scissors cuts paper! You win!</h2>
+                {% else %}
+                <h2>Rock smashes scissors! You lose.</h2> 
+                {% endif %}    
+            {% endif %}
+            {% endif %}
+
+    
+            <div class="col-4">
+                {% if round_count == 0 %}
+                <img src="/static/lefthand.PNG" width="150" height="150" halt="Porto Admin" />
+                {% endif %}
+                {% if user_action %}
+                <h2>Win : {{user_score}}</h2>
+                <br>
+                <!-- <img src="/static/shake.gif" width="150" height="150" halt="Porto Admin" /> -->
+                
+                {% if user_action == "rock" %}
+                <img src="/static/rock.png" width="150" height="150" halt="Porto Admin" />
+                {% elif user_action == "paper" %}
+                <img src="/static/paper.png" width="150" height="150" halt="Porto Admin" />
+                {% else %}
+                <img src="/static/scissor.png" width="170" height="130" halt="Porto Admin" />
+                {% endif %}
+                <br>
+                <h2>{{user_name}}</h2>
+                {% endif %}
+                
+                
+                
+            </div>
+            <div class="col-4" >
+                {% if user_action %}
+                 <h2>Tie : {{tie}}</h2>
+                 {% endif %}
+                <br>
+                </div>
+            <div class="col-4">
+                {% if round_count == 0 %}
+                <img style="filter: invert;" src="/static/righthand.png" width="150" height="150" halt="Porto Admin" />
+                {% endif %}
+                {% if user_action %}
+                <h2>Win : {{bot_score}}</h2>
+                <br>
+                
+                
+                <!-- <img src="/static/shake.gif" style="filter:FlipH;" width="150" height="150" halt="Porto Admin" /> -->
+
+                {% if computer_action == "rock" %}
+                <img src="/static/rock.png" width="150" height="150" halt="Porto Admin" />
+                {% elif computer_action == "paper" %}
+                <img src="/static/paper.png" width="150" height="150" halt="Porto Admin" />
+                {% else %}
+                <img src="/static/scissor.png" width="170" height="130" halt="Porto Admin" />
+                {% endif %}
+                <br>
+                <h2>Bot</h2>
+            </div>
+
+            {% if round_count == 3 %}
+            <h1>Best of three by {{user_name}} : {{best_3}}</h1>
+            <div>
+                <a href=""   class="btn btn-primary">
+                  Continue
+                </a>
+                <a href="/" value="paper" class="btn btn-primary">
+                  Exit
+                </a>
+               </div>
+        
+            {% endif %}
+            
+
+            {% endif %}
+        </div>
+        <br><br><br>
+
+    {% if round_count != 3 %}    
+    <div style="text-align: center;">
+      <label for="user_name">Select your action</label>
+      <!-- <input type="text" name="user_name" > -->
+    </div>
+    <div  style="text-align: center;">
+      <button type="submit" name="rock" value="rock"  class="btn btn-primary">
+        Rock
+      </button>
+      <button type="submit" name="paper" value="paper" class="btn btn-primary">
+        Paper
+      </button>
+      <button type="submit" name="scissor" value="scissor" class="btn btn-primary">
+        Scissor
+      </button>
+    </div>
+    {% endif %}
+
+    
+  </form>
+</div>
+  
+{% endblock body %}
+
