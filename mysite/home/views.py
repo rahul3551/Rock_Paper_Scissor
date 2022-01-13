@@ -4,6 +4,7 @@ from home.models import  User_Action, User_input,Score
 from django.contrib import messages
 # Create your views here.
 import random
+import os
 
 def index(request):
     context = {
@@ -11,7 +12,22 @@ def index(request):
     }
     return render(request, 'index.html', context)
 
+def create_log(user_obj):
+    current_date = datetime.date(datetime.now())
+    current_time = datetime.time(datetime.now())
+    current_time = str(current_time).replace(':', '-')
+    
+    if os.path.exists('game_logs/') == False:
+        os.mkdir('game_logs/')
+        print('game_logs directory created')
 
+    log = open(f"game_logs/{user_obj}__{current_date}__{current_time}.log", "a")
+
+    return log
+
+
+import logging
+logger = logging.getLogger(__name__)
 def play_game(request):
     context={}
     possible_actions = ["rock", "paper", "scissor"]
@@ -31,6 +47,9 @@ def play_game(request):
     if request.method == 'POST' and 'user_name' in request.POST:
         user_name = request.POST['user_name']
         user_obj = User_input( name= user_name)
+        log = create_log(user_obj)
+        log.write("\nUser created: "+ str(user_obj))
+        # logger.debug(f'Player name: {user_obj}')
         user_obj.save()
         Score.objects.create(user_score=0,bot_score=0,tie=0)
        
@@ -41,6 +60,9 @@ def play_game(request):
         user_action = rock
         select_obj.role = rock
         select_obj.save()
+
+        user_obj = User_input.objects.all().values_list('name', flat=True).last()
+        
         if user_action == computer_action:
             tie = int(tie) +1
         elif user_action == "rock":
@@ -48,6 +70,11 @@ def play_game(request):
                 user_score = int(user_score) +1
             else:
                 bot_score = int(bot_score) +1
+        log = create_log(user_obj)
+        log.write("\nUser Action: "+ str(user_action))
+        log.write("\nBot Action: "+ str(computer_action))
+        log.write("\nUser Score: "+ str(user_score))
+        log.write("\nBot Score: "+ str(bot_score))
                 
         Score.objects.all().update(user_score=user_score,bot_score=bot_score,tie=tie)        
         context["user_action"] = user_action
@@ -59,6 +86,8 @@ def play_game(request):
         select_obj = User_Action()
         user_action = paper
         select_obj.role = paper
+        user_obj = User_input.objects.all().values_list('name', flat=True).last()
+        
         if user_action == computer_action:
             tie = int(tie) +1
         elif user_action == "paper":
@@ -68,6 +97,12 @@ def play_game(request):
                 bot_score = int(bot_score) +1
                 
         select_obj.save() 
+        log = create_log(user_obj)
+        log.write("\nUser Action: "+ str(user_action))
+        log.write("\nBot Action: "+ str(computer_action))
+        log.write("\nUser Score: "+ str(user_score))
+        log.write("\nBot Score: "+ str(bot_score))
+        
         Score.objects.all().update(user_score=user_score,bot_score=bot_score,tie=tie)        
         context["user_action"] = user_action
         context["computer_action"] = computer_action
@@ -78,6 +113,8 @@ def play_game(request):
         user_action = scissor
        
         select_obj.role = scissor
+        user_obj = User_input.objects.all().values_list('name', flat=True).last()
+        
         if user_action == computer_action:
            
             tie = int(tie) +1
@@ -88,11 +125,20 @@ def play_game(request):
             else:
                 bot_score = int(bot_score) +1
                 
-        select_obj.save()  
+        select_obj.save() 
+        log = create_log(user_obj)
+        log.write("\nUser Action: "+ str(user_action))
+        log.write("\nBot Action: "+ str(computer_action))
+        log.write("\nUser Score: "+ str(user_score))
+        log.write("\nBot Score: "+ str(bot_score))
+         
         Score.objects.all().update(user_score=user_score,bot_score=bot_score,tie=tie)        
         context["user_action"] = user_action
         context["computer_action"] = computer_action
-       
+
+    
+    
+        
     user_name = User_input.objects.all().last()
     user_name = user_name.name
     round_count = User_Action.objects.all().count()
